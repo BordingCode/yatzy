@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Yatzy a la Bording</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#1a1a2e;
+  --card:#16213e;
+  --gold:#c9a84c;
+  --gold-dim:#8a6d2b;
+  --text:#e0d6c8;
+  --text-dim:#9a8e7f;
+  --red:#c44040;
+  --green:#4a7c59;
+  --border:#2a2a4a;
+  --cell-hover:rgba(201,168,76,.15);
+  --cell-valid:rgba(201,168,76,.25);
+  --held:#3a2a10;
+  --dice-bg:#f5f0e0;
+  --dice-border:#c0b89a;
+  --pip:#222;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Crimson Text',Georgia,serif;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── Screens ── */
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen.active{display:flex}
+
+/* ── Start Screen ── */
+#startScreen{justify-content:center;align-items:center;padding:2rem 1rem;overflow-y:auto}
+.start-title{
+  font-family:'Cinzel',serif;font-weight:900;font-size:2rem;
+  color:var(--gold);text-align:center;margin-bottom:.3rem;
+  text-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+.start-subtitle{text-align:center;color:var(--text-dim);margin-bottom:2rem;font-size:1rem}
+.start-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;width:100%;max-width:380px}
+.start-box label{display:block;color:var(--gold);font-family:'Cinzel',serif;font-weight:700;font-size:.9rem;margin-bottom:.4rem}
+.start-box select,.start-box input{
+  width:100%;padding:.5rem .7rem;border:1px solid var(--border);border-radius:6px;
+  background:#0d0d1a;color:var(--text);font-family:'Crimson Text',serif;font-size:1rem;margin-bottom:.8rem;
+}
+.start-box select:focus,.start-box input:focus{outline:none;border-color:var(--gold)}
+.player-inputs{margin-bottom:.5rem}
+.player-inputs input{margin-bottom:.5rem}
+.btn{
+  display:block;width:100%;padding:.7rem;border:none;border-radius:8px;
+  font-family:'Cinzel',serif;font-weight:700;font-size:1.1rem;cursor:pointer;
+  transition:background .15s,transform .1s;
+}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:var(--gold);color:#1a1a2e}
+.btn-gold:hover{background:#d4b35a}
+.btn-dim{background:var(--border);color:var(--text);margin-top:.5rem}
+
+/* ── Game Screen ── */
+#gameScreen{overflow:hidden}
+.top-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.5rem .8rem;background:#0d0d1a;border-bottom:1px solid var(--border);
+  flex-shrink:0;min-height:40px;
+}
+.player-tabs{display:flex;gap:.3rem;overflow-x:auto;flex:1;min-width:0}
+.player-tab{
+  padding:.25rem .6rem;border-radius:6px;font-family:'Cinzel',serif;font-weight:700;
+  font-size:.75rem;white-space:nowrap;cursor:pointer;border:1px solid transparent;
+  color:var(--text-dim);background:transparent;
+}
+.player-tab.active{color:var(--gold);border-color:var(--gold-dim);background:rgba(201,168,76,.1)}
+.player-tab .tab-score{font-family:'Crimson Text',serif;font-weight:400;font-size:.7rem;margin-left:.3rem;color:var(--text-dim)}
+.turn-info{font-size:.75rem;color:var(--text-dim);white-space:nowrap;margin-left:.5rem;flex-shrink:0}
+
+/* ── Dice Area ── */
+.dice-area{
+  display:flex;flex-direction:column;align-items:center;
+  padding:.6rem .5rem;flex-shrink:0;background:linear-gradient(180deg,var(--bg),#141428);
+  border-bottom:1px solid var(--border);
+}
+.dice-row{display:flex;gap:.5rem;margin-bottom:.5rem;justify-content:center}
+.die{
+  width:52px;height:52px;background:var(--dice-bg);border:2px solid var(--dice-border);
+  border-radius:8px;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);
+  padding:6px;cursor:pointer;transition:transform .1s,border-color .15s,box-shadow .15s;
+  position:relative;
+}
+.die:active{transform:scale(.93)}
+.die.held{border-color:var(--gold);box-shadow:0 0 10px rgba(201,168,76,.4);background:#f8f0d0}
+.die.held::after{
+  content:'HOLD';position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);
+  font-size:.5rem;font-family:'Cinzel',serif;font-weight:700;color:var(--gold);white-space:nowrap;
+}
+.die.disabled{opacity:.4;pointer-events:none}
+.pip{width:100%;height:100%;border-radius:50%;background:var(--pip)}
+.pip.hide{visibility:hidden}
+
+.roll-btn{
+  padding:.45rem 2rem;border:2px solid var(--gold);border-radius:8px;
+  background:rgba(201,168,76,.15);color:var(--gold);font-family:'Cinzel',serif;
+  font-weight:700;font-size:.95rem;cursor:pointer;transition:background .15s;
+}
+.roll-btn:hover{background:rgba(201,168,76,.25)}
+.roll-btn:active{transform:scale(.96)}
+.roll-btn:disabled{opacity:.35;cursor:default;transform:none}
+
+@keyframes diceRoll{
+  0%{transform:rotateZ(0deg) scale(1)}
+  25%{transform:rotateZ(15deg) scale(.9)}
+  50%{transform:rotateZ(-10deg) scale(1.05)}
+  75%{transform:rotateZ(5deg) scale(.95)}
+  100%{transform:rotateZ(0deg) scale(1)}
+}
+.die.rolling{animation:diceRoll .3s ease-out}
+
+/* ── Scorecard ── */
+.scorecard-wrap{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+.scorecard{
+  border-collapse:collapse;width:100%;min-width:420px;font-size:.8rem;
+}
+.scorecard th,.scorecard td{
+  border:1px solid var(--border);padding:.25rem .3rem;text-align:center;
+  white-space:nowrap;
+}
+.scorecard thead th{
+  position:sticky;top:0;z-index:2;background:#0d0d1a;
+  font-family:'Cinzel',serif;font-weight:700;color:var(--gold);font-size:.7rem;
+}
+.scorecard .row-label{
+  position:sticky;left:0;z-index:1;background:var(--card);
+  text-align:left;font-weight:600;padding-left:.5rem;color:var(--text);
+  min-width:95px;max-width:95px;
+}
+.scorecard thead .corner{position:sticky;left:0;z-index:3;background:#0d0d1a}
+.scorecard .col-header{min-width:52px}
+
+.scorecard td.score-cell{cursor:default;height:28px;transition:background .1s}
+.scorecard td.score-cell.filled{color:var(--text);font-weight:700}
+.scorecard td.score-cell.valid{
+  background:var(--cell-valid);cursor:pointer;color:var(--gold);font-weight:400;font-style:italic;
+}
+.scorecard td.score-cell.valid:hover{background:rgba(201,168,76,.35)}
+.scorecard td.score-cell.zero-score{color:var(--text-dim)}
+
+.scorecard .sum-row td,.scorecard .sum-row th{background:rgba(201,168,76,.08);font-weight:700}
+.scorecard .bonus-row td{color:var(--green);font-weight:700}
+.scorecard .bonus-row td.no-bonus{color:var(--text-dim);font-weight:400}
+.scorecard .total-row td,.scorecard .total-row th{
+  background:rgba(201,168,76,.12);font-weight:700;color:var(--gold);
+  font-family:'Cinzel',serif;font-size:.85rem;
+}
+
+.scorecard .col3-marker{border-left:2px solid rgba(76,168,100,.3)}
+.scorecard .col4-marker{border-left:2px solid rgba(100,76,168,.3)}
+.scorecard .col5-marker{border-left:2px solid rgba(168,76,76,.3)}
+
+/* ── Game Over ── */
+#endScreen{justify-content:center;align-items:center;padding:2rem 1rem;overflow-y:auto}
+.end-title{font-family:'Cinzel',serif;font-weight:900;font-size:1.8rem;color:var(--gold);margin-bottom:.3rem;text-align:center}
+.end-subtitle{color:var(--text-dim);margin-bottom:1.5rem;text-align:center;font-size:1rem}
+.end-scores{width:100%;max-width:380px;margin-bottom:1.5rem}
+.end-score-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.6rem .8rem;border-bottom:1px solid var(--border);
+}
+.end-score-row.winner{color:var(--gold);font-weight:700}
+.end-score-name{font-size:1.1rem}
+.end-score-val{font-family:'Cinzel',serif;font-weight:700;font-size:1.2rem}
+.end-btns{width:100%;max-width:380px}
+
+@media(max-width:400px){
+  .die{width:46px;height:46px;padding:5px}
+  .start-title{font-size:1.5rem}
+  .scorecard{font-size:.72rem}
+  .scorecard .row-label{min-width:80px;max-width:80px;font-size:.7rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ START SCREEN ═══ -->
+<div class="screen active" id="startScreen">
+  <div class="start-title">Yatzy</div>
+  <div class="start-subtitle">a la Bording</div>
+  <div class="start-box">
+    <label>Number of Players</label>
+    <select id="playerCount">
+      <option value="1">1 Player</option>
+      <option value="2" selected>2 Players</option>
+      <option value="3">3 Players</option>
+      <option value="4">4 Players</option>
+    </select>
+    <div class="player-inputs" id="playerInputs"></div>
+    <button class="btn btn-gold" id="startBtn">Start Game</button>
+  </div>
+</div>
+
+<!-- ═══ GAME SCREEN ═══ -->
+<div class="screen" id="gameScreen">
+  <div class="top-bar">
+    <div class="player-tabs" id="playerTabs"></div>
+    <div class="turn-info" id="turnInfo"></div>
+  </div>
+  <div class="dice-area">
+    <div class="dice-row" id="diceRow"></div>
+    <button class="roll-btn" id="rollBtn">Roll</button>
+  </div>
+  <div class="scorecard-wrap">
+    <table class="scorecard" id="scorecard"></table>
+  </div>
+</div>
+
+<!-- ═══ END SCREEN ═══ -->
+<div class="screen" id="endScreen">
+  <div class="end-title">Game Over</div>
+  <div class="end-subtitle" id="endSubtitle"></div>
+  <div class="end-scores" id="endScores"></div>
+  <div class="end-btns">
+    <button class="btn btn-gold" id="playAgainBtn">Play Again</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════
+const ROW_NAMES = [
+  'Ones','Twos','Threes','Fours','Fives','Sixes',
+  'One Pair','Two Pairs','Three of a Kind','Four of a Kind',
+  'Small Straight','Large Straight','Full House','Chance','Yatzy'
+];
+const UPPER_COUNT = 6;
+const TOTAL_ROWS = 15;
+const TOTAL_COLS = 5;
+const BONUS_THRESHOLD = 63;
+const BONUS_POINTS = 50;
+const MULTIPLIERS = [1, 2, 3, 4, 5];
+
+// ═══════════════════════════════════════════
+// SCORING FUNCTIONS
+// ═══════════════════════════════════════════
+function counts(dice) {
+  const c = [0,0,0,0,0,0,0];
+  dice.forEach(d => c[d]++);
+  return c;
+}
+
+function calcN(dice, n) {
+  return dice.filter(d => d === n).length * n;
+}
+
+function calcOnePair(dice) {
+  const c = counts(dice);
+  for (let i = 6; i >= 1; i--) {
+    if (c[i] >= 2) return i * 2;
+  }
+  return 0;
+}
+
+function calcTwoPairs(dice) {
+  const c = counts(dice);
+  const pairs = [];
+  for (let i = 6; i >= 1; i--) {
+    if (c[i] >= 2) pairs.push(i);
+  }
+  if (pairs.length >= 2) return pairs[0] * 2 + pairs[1] * 2;
+  return 0;
+}
+
+function calcThreeOfAKind(dice) {
+  const c = counts(dice);
+  for (let i = 6; i >= 1; i--) {
+    if (c[i] >= 3) return i * 3;
+  }
+  return 0;
+}
+
+function calcFourOfAKind(dice) {
+  const c = counts(dice);
+  for (let i = 6; i >= 1; i--) {
+    if (c[i] >= 4) return i * 4;
+  }
+  return 0;
+}
+
+function calcSmallStraight(dice) {
+  const s = [...dice].sort().join('');
+  return s === '12345' ? 15 : 0;
+}
+
+function calcLargeStraight(dice) {
+  const s = [...dice].sort().join('');
+  return s === '23456' ? 20 : 0;
+}
+
+function calcFullHouse(dice) {
+  const c = counts(dice);
+  let three = false, two = false;
+  for (let i = 1; i <= 6; i++) {
+    if (c[i] === 3) three = true;
+    if (c[i] === 2) two = true;
+  }
+  return (three && two) ? dice.reduce((a, b) => a + b, 0) : 0;
+}
+
+function calcChance(dice) {
+  return dice.reduce((a, b) => a + b, 0);
+}
+
+function calcYatzy(dice) {
+  if (dice.length < 5) return 0;
+  const c = counts(dice);
+  for (let i = 1; i <= 6; i++) {
+    if (c[i] === 5) return 50;
+  }
+  return 0;
+}
+
+const CALC = [
+  d => calcN(d, 1), d => calcN(d, 2), d => calcN(d, 3),
+  d => calcN(d, 4), d => calcN(d, 5), d => calcN(d, 6),
+  calcOnePair, calcTwoPairs, calcThreeOfAKind, calcFourOfAKind,
+  calcSmallStraight, calcLargeStraight, calcFullHouse, calcChance, calcYatzy
+];
+
+// ═══════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════
+let players = [];
+let currentPlayer = 0;
+let dice = [1, 1, 1, 1, 1];
+let held = [false, false, false, false, false];
+let rollsLeft = 3;
+let hasRolled = false;
+let rollHistory = [];
+let viewingPlayer = 0;
+
+// ═══════════════════════════════════════════
+// COLUMN 5 LOGIC
+// ═══════════════════════════════════════════
+function calcScoreForCol5(rowIdx) {
+  let best = 0;
+  for (const roll of rollHistory) {
+    if (roll.values.length === 0) continue;
+    const score = CALC[rowIdx](roll.values);
+    if (score > best) best = score;
+  }
+  return best;
+}
+
+// ═══════════════════════════════════════════
+// VALID CELL DETECTION
+// ═══════════════════════════════════════════
+function getNextRow3(p) {
+  for (let r = 0; r < TOTAL_ROWS; r++) {
+    if (players[p].scores[r][2] === null) return r;
+  }
+  return -1;
+}
+
+function getNextRow4(p) {
+  for (let r = TOTAL_ROWS - 1; r >= 0; r--) {
+    if (players[p].scores[r][3] === null) return r;
+  }
+  return -1;
+}
+
+function isValidCell(p, row, col) {
+  if (players[p].scores[row][col] !== null) return false;
+  if (col === 2) return row === getNextRow3(p);
+  if (col === 3) return row === getNextRow4(p);
+  return true;
+}
+
+function getPotentialScore(row, col) {
+  if (col === 4) {
+    return calcScoreForCol5(row);
+  }
+  return CALC[row](dice);
+}
+
+// ═══════════════════════════════════════════
+// BONUS & TOTALS
+// ═══════════════════════════════════════════
+function getUpperSum(p, col) {
+  let sum = 0;
+  for (let r = 0; r < UPPER_COUNT; r++) {
+    if (players[p].scores[r][col] !== null) sum += players[p].scores[r][col];
+  }
+  return sum;
+}
+
+function getUpperComplete(p, col) {
+  for (let r = 0; r < UPPER_COUNT; r++) {
+    if (players[p].scores[r][col] === null) return false;
+  }
+  return true;
+}
+
+function getBonus(p, col) {
+  if (!getUpperComplete(p, col)) return null;
+  return getUpperSum(p, col) >= BONUS_THRESHOLD ? BONUS_POINTS : 0;
+}
+
+function getColTotal(p, col) {
+  let sum = 0;
+  for (let r = 0; r < TOTAL_ROWS; r++) {
+    if (players[p].scores[r][col] !== null) sum += players[p].scores[r][col] * MULTIPLIERS[col];
+  }
+  const bonus = getBonus(p, col);
+  if (bonus) sum += bonus * MULTIPLIERS[col];
+  return sum;
+}
+
+function getGrandTotal(p) {
+  let sum = 0;
+  for (let c = 0; c < TOTAL_COLS; c++) sum += getColTotal(p, c);
+  return sum;
+}
+
+function isPlayerDone(p) {
+  for (let r = 0; r < TOTAL_ROWS; r++)
+    for (let c = 0; c < TOTAL_COLS; c++)
+      if (players[p].scores[r][c] === null) return false;
+  return true;
+}
+
+function isGameOver() {
+  return players.every((_, i) => isPlayerDone(i));
+}
+
+// ═══════════════════════════════════════════
+// DICE RENDERING
+// ═══════════════════════════════════════════
+const PIP_MAP = {
+  1: [0,0,0,0,1,0,0,0,0],
+  2: [0,0,1,0,0,0,1,0,0],
+  3: [0,0,1,0,1,0,1,0,0],
+  4: [1,0,1,0,0,0,1,0,1],
+  5: [1,0,1,0,1,0,1,0,1],
+  6: [1,0,1,1,0,1,1,0,1],
+};
+
+function renderDie(value) {
+  const pips = PIP_MAP[value] || PIP_MAP[1];
+  return pips.map(p => `<div class="pip${p ? '' : ' hide'}"></div>`).join('');
+}
+
+function renderDice() {
+  const row = document.getElementById('diceRow');
+  row.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const d = document.createElement('div');
+    d.className = 'die' + (held[i] ? ' held' : '') + (!hasRolled ? ' disabled' : '');
+    d.innerHTML = renderDie(dice[i]);
+    d.addEventListener('click', () => toggleHold(i));
+    row.appendChild(d);
+  }
+}
+
+function toggleHold(i) {
+  if (!hasRolled || rollsLeft === 0) return;
+  held[i] = !held[i];
+  renderDice();
+}
+
+// ═══════════════════════════════════════════
+// ROLLING
+// ═══════════════════════════════════════════
+function rollDice() {
+  if (rollsLeft <= 0) return;
+
+  const rolledIndices = [];
+  const rolledValues = [];
+
+  for (let i = 0; i < 5; i++) {
+    if (!held[i]) {
+      dice[i] = Math.floor(Math.random() * 6) + 1;
+      rolledIndices.push(i);
+      rolledValues.push(dice[i]);
+    }
+  }
+
+  rollHistory.push({ indices: rolledIndices, values: rolledValues });
+  rollsLeft--;
+  hasRolled = true;
+
+  // Animate rolled dice
+  const dieEls = document.querySelectorAll('.die');
+  rolledIndices.forEach(idx => {
+    if (dieEls[idx]) {
+      dieEls[idx].classList.add('rolling');
+      setTimeout(() => dieEls[idx].classList.remove('rolling'), 300);
+    }
+  });
+
+  renderDice();
+  renderRollBtn();
+  renderScorecard();
+}
+
+function renderRollBtn() {
+  const btn = document.getElementById('rollBtn');
+  if (!hasRolled) {
+    btn.textContent = 'Roll';
+    btn.disabled = false;
+  } else if (rollsLeft > 0) {
+    btn.textContent = `Re-roll (${rollsLeft} left)`;
+    btn.disabled = false;
+  } else {
+    btn.textContent = 'No rolls left';
+    btn.disabled = true;
+  }
+}
+
+// ═══════════════════════════════════════════
+// SCORECARD
+// ═══════════════════════════════════════════
+function renderScorecard() {
+  const table = document.getElementById('scorecard');
+  const p = viewingPlayer;
+  const isCurrentP = p === currentPlayer;
+  const canPlace = isCurrentP && hasRolled;
+
+  let html = '<thead><tr><th class="corner"></th>';
+  for (let c = 0; c < TOTAL_COLS; c++) {
+    html += `<th class="col-header">&times;${MULTIPLIERS[c]}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  // Upper section
+  for (let r = 0; r < UPPER_COUNT; r++) {
+    html += renderRow(p, r, canPlace);
+  }
+
+  // Sum row
+  html += '<tr class="sum-row"><th class="row-label">Sum</th>';
+  for (let c = 0; c < TOTAL_COLS; c++) {
+    const sum = getUpperSum(p, c);
+    html += `<td>${sum}</td>`;
+  }
+  html += '</tr>';
+
+  // Bonus row
+  html += '<tr class="bonus-row"><th class="row-label">Bonus</th>';
+  for (let c = 0; c < TOTAL_COLS; c++) {
+    const bonus = getBonus(p, c);
+    if (bonus === null) {
+      const need = BONUS_THRESHOLD - getUpperSum(p, c);
+      html += `<td class="no-bonus">${need > 0 ? need + ' to go' : ''}</td>`;
+    } else if (bonus > 0) {
+      html += `<td>+${bonus * MULTIPLIERS[c]}</td>`;
+    } else {
+      html += `<td class="no-bonus">0</td>`;
+    }
+  }
+  html += '</tr>';
+
+  // Lower section
+  for (let r = UPPER_COUNT; r < TOTAL_ROWS; r++) {
+    html += renderRow(p, r, canPlace);
+  }
+
+  // Total row
+  html += '<tr class="total-row"><th class="row-label">Total</th>';
+  for (let c = 0; c < TOTAL_COLS; c++) {
+    html += `<td>${getColTotal(p, c)}</td>`;
+  }
+  html += '</tr>';
+
+  // Grand total
+  html += '<tr class="total-row"><th class="row-label">Grand Total</th>';
+  html += `<td colspan="${TOTAL_COLS}" style="text-align:center;font-size:1rem">${getGrandTotal(p)}</td>`;
+  html += '</tr>';
+
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  // Add click handlers for valid cells
+  if (canPlace) {
+    table.querySelectorAll('td.valid').forEach(td => {
+      td.addEventListener('click', () => {
+        const r = parseInt(td.dataset.row);
+        const c = parseInt(td.dataset.col);
+        placeScore(r, c);
+      });
+    });
+  }
+}
+
+function renderRow(p, r, canPlace) {
+  let html = `<tr><th class="row-label">${ROW_NAMES[r]}</th>`;
+  for (let c = 0; c < TOTAL_COLS; c++) {
+    const val = players[p].scores[r][c];
+    if (val !== null) {
+      const display = val * MULTIPLIERS[c];
+      html += `<td class="score-cell filled${val === 0 ? ' zero-score' : ''}">${display}</td>`;
+    } else if (canPlace && isValidCell(p, r, c)) {
+      const potential = getPotentialScore(r, c);
+      const display = potential * MULTIPLIERS[c];
+      html += `<td class="score-cell valid${potential === 0 ? ' zero-score' : ''}" data-row="${r}" data-col="${c}">${display}</td>`;
+    } else {
+      html += `<td class="score-cell"></td>`;
+    }
+  }
+  html += '</tr>';
+  return html;
+}
+
+// ═══════════════════════════════════════════
+// PLACE SCORE
+// ═══════════════════════════════════════════
+function placeScore(row, col) {
+  const p = currentPlayer;
+  if (players[p].scores[row][col] !== null) return;
+  if (!isValidCell(p, row, col)) return;
+
+  const score = getPotentialScore(row, col);
+  players[p].scores[row][col] = score;
+
+  // Next turn
+  nextTurn();
+}
+
+function nextTurn() {
+  if (isGameOver()) {
+    showEndScreen();
+    return;
+  }
+
+  // Find next player who isn't done
+  let next = (currentPlayer + 1) % players.length;
+  while (isPlayerDone(next)) {
+    next = (next + 1) % players.length;
+  }
+
+  currentPlayer = next;
+  viewingPlayer = next;
+  dice = [1, 1, 1, 1, 1];
+  held = [false, false, false, false, false];
+  rollsLeft = 3;
+  hasRolled = false;
+  rollHistory = [];
+
+  renderAll();
+}
+
+// ═══════════════════════════════════════════
+// PLAYER TABS
+// ═══════════════════════════════════════════
+function renderTabs() {
+  const tabs = document.getElementById('playerTabs');
+  tabs.innerHTML = '';
+  players.forEach((p, i) => {
+    const tab = document.createElement('div');
+    tab.className = 'player-tab' + (i === viewingPlayer ? ' active' : '');
+    const total = getGrandTotal(i);
+    tab.innerHTML = `${p.name}<span class="tab-score">${total}</span>`;
+    if (i === currentPlayer) tab.style.borderColor = 'var(--gold-dim)';
+    tab.addEventListener('click', () => {
+      viewingPlayer = i;
+      renderTabs();
+      renderScorecard();
+    });
+    tabs.appendChild(tab);
+  });
+}
+
+function renderTurnInfo() {
+  const info = document.getElementById('turnInfo');
+  const cellsLeft = players[currentPlayer].scores.flat().filter(s => s === null).length;
+  info.textContent = `${players[currentPlayer].name}'s turn`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════
+function renderAll() {
+  renderDice();
+  renderRollBtn();
+  renderTabs();
+  renderTurnInfo();
+  renderScorecard();
+}
+
+// ═══════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showEndScreen() {
+  showScreen('endScreen');
+  const sorted = players.map((p, i) => ({ name: p.name, total: getGrandTotal(i) }))
+    .sort((a, b) => b.total - a.total);
+
+  document.getElementById('endSubtitle').textContent =
+    players.length > 1 ? `${sorted[0].name} wins!` : 'Final Score';
+
+  const container = document.getElementById('endScores');
+  container.innerHTML = '';
+  sorted.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'end-score-row' + (i === 0 ? ' winner' : '');
+    row.innerHTML = `<span class="end-score-name">${i + 1}. ${p.name}</span><span class="end-score-val">${p.total}</span>`;
+    container.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════
+// START SCREEN LOGIC
+// ═══════════════════════════════════════════
+function updatePlayerInputs() {
+  const n = parseInt(document.getElementById('playerCount').value);
+  const container = document.getElementById('playerInputs');
+  container.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = `Player ${i + 1} name`;
+    input.value = `Player ${i + 1}`;
+    input.id = `pname${i}`;
+    container.appendChild(input);
+  }
+}
+
+function startGame() {
+  const n = parseInt(document.getElementById('playerCount').value);
+  players = [];
+  for (let i = 0; i < n; i++) {
+    const name = document.getElementById(`pname${i}`).value.trim() || `Player ${i + 1}`;
+    const scores = [];
+    for (let r = 0; r < TOTAL_ROWS; r++) {
+      scores.push(new Array(TOTAL_COLS).fill(null));
+    }
+    players.push({ name, scores });
+  }
+
+  currentPlayer = 0;
+  viewingPlayer = 0;
+  dice = [1, 1, 1, 1, 1];
+  held = [false, false, false, false, false];
+  rollsLeft = 3;
+  hasRolled = false;
+  rollHistory = [];
+
+  showScreen('gameScreen');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════
+document.getElementById('playerCount').addEventListener('change', updatePlayerInputs);
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('rollBtn').addEventListener('click', rollDice);
+document.getElementById('playAgainBtn').addEventListener('click', () => {
+  showScreen('startScreen');
+  updatePlayerInputs();
+});
+
+// Init
+updatePlayerInputs();
+</script>
+</body>
+</html>
