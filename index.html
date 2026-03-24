@@ -414,14 +414,18 @@ function getBonus(p, col) {
   return getUpperSum(p, col) >= BONUS_THRESHOLD ? BONUS_POINTS : 0;
 }
 
-function getColTotal(p, col) {
+function getColBaseSum(p, col) {
   let sum = 0;
   for (let r = 0; r < TOTAL_ROWS; r++) {
-    if (players[p].scores[r][col] !== null) sum += players[p].scores[r][col] * MULTIPLIERS[col];
+    if (players[p].scores[r][col] !== null) sum += players[p].scores[r][col];
   }
   const bonus = getBonus(p, col);
-  if (bonus) sum += bonus * MULTIPLIERS[col];
+  if (bonus) sum += bonus;
   return sum;
+}
+
+function getColTotal(p, col) {
+  return getColBaseSum(p, col) * MULTIPLIERS[col];
 }
 
 function getGrandTotal(p) {
@@ -561,7 +565,7 @@ function renderScorecard() {
       const need = BONUS_THRESHOLD - getUpperSum(p, c);
       html += `<td class="no-bonus">${need > 0 ? need + ' to go' : ''}</td>`;
     } else if (bonus > 0) {
-      html += `<td>+${bonus * MULTIPLIERS[c]}</td>`;
+      html += `<td>+${bonus}</td>`;
     } else {
       html += `<td class="no-bonus">0</td>`;
     }
@@ -573,8 +577,15 @@ function renderScorecard() {
     html += renderRow(p, r, canPlace);
   }
 
-  // Total row
-  html += '<tr class="total-row"><th class="row-label">Total</th>';
+  // Column base sum row (all rows + bonus, before multiplier)
+  html += '<tr class="sum-row"><th class="row-label">Col Sum</th>';
+  for (let c = 0; c < TOTAL_COLS; c++) {
+    html += `<td>${getColBaseSum(p, c)}</td>`;
+  }
+  html += '</tr>';
+
+  // Total row (base sum × multiplier)
+  html += '<tr class="total-row"><th class="row-label">Total (&times;)</th>';
   for (let c = 0; c < TOTAL_COLS; c++) {
     html += `<td>${getColTotal(p, c)}</td>`;
   }
@@ -605,12 +616,10 @@ function renderRow(p, r, canPlace) {
   for (let c = 0; c < TOTAL_COLS; c++) {
     const val = players[p].scores[r][c];
     if (val !== null) {
-      const display = val * MULTIPLIERS[c];
-      html += `<td class="score-cell filled${val === 0 ? ' zero-score' : ''}">${display}</td>`;
+      html += `<td class="score-cell filled${val === 0 ? ' zero-score' : ''}">${val}</td>`;
     } else if (canPlace && isValidCell(p, r, c)) {
       const potential = getPotentialScore(r, c);
-      const display = potential * MULTIPLIERS[c];
-      html += `<td class="score-cell valid${potential === 0 ? ' zero-score' : ''}" data-row="${r}" data-col="${c}">${display}</td>`;
+      html += `<td class="score-cell valid${potential === 0 ? ' zero-score' : ''}" data-row="${r}" data-col="${c}">${potential}</td>`;
     } else {
       html += `<td class="score-cell"></td>`;
     }
