@@ -376,19 +376,23 @@ let held = [false, false, false, false, false];
 let rollsLeft = 3;
 let hasRolled = false;
 let rollHistory = [];
+let heldSnapshot = [false, false, false, false, false];
 let viewingPlayer = 0;
 
 // ═══════════════════════════════════════════
 // COLUMN 5 LOGIC
 // ═══════════════════════════════════════════
+function getCol5Dice() {
+  // First roll: all 5 dice are from the same throw
+  if (rollHistory.length <= 1) return [...dice];
+  // After re-rolls: only dice held before the last roll count
+  return dice.filter((_, i) => heldSnapshot[i]);
+}
+
 function calcScoreForCol5(rowIdx) {
-  let best = 0;
-  for (const roll of rollHistory) {
-    if (roll.values.length === 0) continue;
-    const score = CALC[rowIdx](roll.values);
-    if (score > best) best = score;
-  }
-  return best;
+  const col5dice = getCol5Dice();
+  if (col5dice.length === 0) return 0;
+  return CALC[rowIdx](col5dice);
 }
 
 // ═══════════════════════════════════════════
@@ -516,6 +520,9 @@ function toggleHold(i) {
 // ═══════════════════════════════════════════
 function rollDice() {
   if (rollsLeft <= 0) return;
+
+  // Snapshot held state before rolling (for column 5 scoring)
+  heldSnapshot = [...held];
 
   const rolledIndices = [];
   const rolledValues = [];
@@ -690,6 +697,7 @@ function nextTurn() {
   viewingPlayer = next;
   dice = [1, 1, 1, 1, 1];
   held = [false, false, false, false, false];
+  heldSnapshot = [false, false, false, false, false];
   rollsLeft = 3;
   hasRolled = false;
   rollHistory = [];
@@ -797,6 +805,7 @@ function startGame() {
   viewingPlayer = 0;
   dice = [1, 1, 1, 1, 1];
   held = [false, false, false, false, false];
+  heldSnapshot = [false, false, false, false, false];
   rollsLeft = 3;
   hasRolled = false;
   rollHistory = [];
