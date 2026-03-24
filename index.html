@@ -180,6 +180,35 @@ body{
 .end-score-val{font-family:'Cinzel',serif;font-weight:700;font-size:1.2rem}
 .end-btns{width:100%;max-width:380px}
 
+/* ── Highscores ── */
+.highscore-box{
+  width:100%;max-width:380px;margin-top:1.5rem;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:1rem 1.2rem;
+}
+.highscore-title{
+  font-family:'Cinzel',serif;font-weight:700;font-size:1rem;
+  color:var(--gold);margin-bottom:.6rem;text-align:center;
+}
+.highscore-list{list-style:none}
+.highscore-list li{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.95rem;
+}
+.highscore-list li:last-child{border-bottom:none}
+.hs-rank{color:var(--text-dim);width:1.5rem;font-weight:700;font-size:.85rem}
+.hs-name{flex:1;margin:0 .5rem}
+.hs-score{font-family:'Cinzel',serif;font-weight:700;color:var(--gold)}
+.hs-date{color:var(--text-dim);font-size:.7rem;margin-left:.5rem}
+.highscore-list li.hs-new{color:var(--gold)}
+.highscore-empty{color:var(--text-dim);text-align:center;font-style:italic;padding:.5rem 0}
+.hs-clear{
+  display:block;margin:.8rem auto 0;background:none;border:1px solid var(--border);
+  color:var(--text-dim);padding:.3rem .8rem;border-radius:6px;font-size:.75rem;
+  cursor:pointer;font-family:'Crimson Text',serif;
+}
+.hs-clear:hover{border-color:var(--red);color:var(--red)}
+
 @media(max-width:400px){
   .die{width:46px;height:46px;padding:5px}
   .start-title{font-size:1.5rem}
@@ -205,6 +234,7 @@ body{
     <div class="player-inputs" id="playerInputs"></div>
     <button class="btn btn-gold" id="startBtn">Start Game</button>
   </div>
+  <div class="highscore-box" id="startHighscores"></div>
 </div>
 
 <!-- ═══ GAME SCREEN ═══ -->
@@ -230,6 +260,7 @@ body{
   <div class="end-btns">
     <button class="btn btn-gold" id="playAgainBtn">Play Again</button>
   </div>
+  <div class="highscore-box" id="endHighscores"></div>
 </div>
 
 <script>
@@ -728,6 +759,9 @@ function showEndScreen() {
     row.innerHTML = `<span class="end-score-name">${i + 1}. ${p.name}</span><span class="end-score-val">${p.total}</span>`;
     container.appendChild(row);
   });
+
+  const newIndices = saveGameHighscores();
+  renderHighscoreBox('endHighscores', newIndices);
 }
 
 // ═══════════════════════════════════════════
@@ -772,6 +806,68 @@ function startGame() {
 }
 
 // ═══════════════════════════════════════════
+// HIGHSCORES (localStorage)
+// ═══════════════════════════════════════════
+const HS_KEY = 'yatzy_bording_highscores';
+const HS_MAX = 10;
+
+function getHighscores() {
+  try { return JSON.parse(localStorage.getItem(HS_KEY)) || []; }
+  catch { return []; }
+}
+
+function saveHighscore(name, score) {
+  const list = getHighscores();
+  const entry = { name, score, date: new Date().toLocaleDateString('da-DK') };
+  list.push(entry);
+  list.sort((a, b) => b.score - a.score);
+  if (list.length > HS_MAX) list.length = HS_MAX;
+  localStorage.setItem(HS_KEY, JSON.stringify(list));
+  return list.findIndex(e => e === entry);
+}
+
+function saveGameHighscores() {
+  const newIndices = [];
+  players.forEach((p, i) => {
+    const total = getGrandTotal(i);
+    const idx = saveHighscore(p.name, total);
+    newIndices.push(idx);
+  });
+  return newIndices;
+}
+
+function renderHighscoreBox(containerId, highlightIndices) {
+  const container = document.getElementById(containerId);
+  const list = getHighscores();
+  let html = '<div class="highscore-title">High Scores</div>';
+  if (!list.length) {
+    html += '<div class="highscore-empty">No scores yet</div>';
+  } else {
+    html += '<ul class="highscore-list">';
+    list.forEach((e, i) => {
+      const isNew = highlightIndices && highlightIndices.includes(i);
+      html += `<li class="${isNew ? 'hs-new' : ''}">
+        <span class="hs-rank">${i + 1}.</span>
+        <span class="hs-name">${e.name}</span>
+        <span class="hs-score">${e.score}</span>
+        <span class="hs-date">${e.date || ''}</span>
+      </li>`;
+    });
+    html += '</ul>';
+  }
+  if (list.length) {
+    html += '<button class="hs-clear" onclick="clearHighscores()">Clear scores</button>';
+  }
+  container.innerHTML = html;
+}
+
+function clearHighscores() {
+  localStorage.removeItem(HS_KEY);
+  renderHighscoreBox('startHighscores');
+  renderHighscoreBox('endHighscores');
+}
+
+// ═══════════════════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════════════════
 document.getElementById('playerCount').addEventListener('change', updatePlayerInputs);
@@ -780,10 +876,12 @@ document.getElementById('rollBtn').addEventListener('click', rollDice);
 document.getElementById('playAgainBtn').addEventListener('click', () => {
   showScreen('startScreen');
   updatePlayerInputs();
+  renderHighscoreBox('startHighscores');
 });
 
 // Init
 updatePlayerInputs();
+renderHighscoreBox('startHighscores');
 </script>
 </body>
 </html>
