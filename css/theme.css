@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  /* Wood tones */
+  --wood-dark:#4A2E14;
+  --wood-medium:#6B4423;
+  --wood-light:#8B5E3C;
+  --wood-highlight:#C4956A;
+  --wood-surface:#7A5231;
+
+  /* Felt */
+  --felt:#2A6B2A;
+  --felt-dark:#1B4D1B;
+  --felt-light:#358535;
+  --felt-border:#3D7A35;
+
+  /* Dice */
+  --dice-white:#FEFCF6;
+  --dice-border:#D0C8B8;
+  --dice-shadow:rgba(0,0,0,.35);
+  --pip-color:#2C2C2C;
+
+  /* Text */
+  --text-light:#F0E8DC;
+  --text-cream:#E8D8C4;
+  --text-warm:#D4C4A8;
+  --text-dim:#9A8A74;
+
+  /* Accents */
+  --brass:#B8963E;
+  --brass-light:#D4B35A;
+  --brass-dim:#8A6D2B;
+  --leather:#6B3A2A;
+  --leather-light:#8B5A4A;
+  --red:#C44040;
+  --green-score:#5A9A5A;
+}
+
+html,body{height:100%;overflow:hidden}
+
+body{
+  color:var(--text-light);
+  font-family:'Crimson Text',Georgia,serif;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;
+  flex-direction:column;
+  /* Wood grain background */
+  background:
+    repeating-linear-gradient(
+      88deg,
+      transparent,
+      transparent 28px,
+      rgba(0,0,0,.04) 28px,
+      rgba(0,0,0,.04) 29px
+    ),
+    repeating-linear-gradient(
+      92deg,
+      transparent,
+      transparent 42px,
+      rgba(0,0,0,.03) 42px,
+      rgba(0,0,0,.03) 43px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 60px,
+      rgba(255,255,255,.02) 60px,
+      rgba(255,255,255,.02) 61px
+    ),
+    radial-gradient(ellipse at 20% 50%, rgba(196,149,106,.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 25%, rgba(180,130,90,.2) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 85%, rgba(160,110,70,.15) 0%, transparent 45%),
+    linear-gradient(180deg, #7A5231, #6B4423, #5C3A1E, #6B4423);
+}
+
+/* Felt texture mixin-like pattern */
+.felt-bg{
+  background:
+    radial-gradient(circle at 15% 25%, rgba(255,255,255,.015) 1px, transparent 1px),
+    radial-gradient(circle at 45% 65%, rgba(0,0,0,.025) 1px, transparent 1px),
+    radial-gradient(circle at 75% 35%, rgba(255,255,255,.015) 1px, transparent 1px),
+    radial-gradient(circle at 85% 85%, rgba(0,0,0,.025) 1px, transparent 1px),
+    radial-gradient(circle at 35% 15%, rgba(0,0,0,.02) 1px, transparent 1px),
+    radial-gradient(circle at 55% 45%, rgba(255,255,255,.01) 1px, transparent 1px),
+    linear-gradient(170deg, #2D6A27, #256022, #1E501A);
+  box-shadow:inset 0 2px 10px rgba(0,0,0,.35);
+}
+
+/* Brass/wood buttons */
+.btn{
+  display:block;width:100%;padding:.7rem;border:none;border-radius:8px;
+  font-family:'Cinzel',serif;font-weight:700;font-size:1.1rem;cursor:pointer;
+  transition:background .15s,transform .1s;
+}
+.btn:active{transform:scale(.97)}
+
+.btn-brass{
+  background:linear-gradient(180deg, #C9A84C, #A88530);
+  color:#2A1A08;
+  text-shadow:0 1px 0 rgba(255,255,255,.2);
+  box-shadow:0 2px 4px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.2);
+}
+.btn-brass:hover{background:linear-gradient(180deg, #D4B35A, #B89540)}
+
+.btn-wood{
+  background:linear-gradient(180deg, var(--wood-light), var(--wood-medium));
+  color:var(--text-cream);
+  border:1px solid var(--wood-dark);
+  box-shadow:0 2px 4px rgba(0,0,0,.3);
+  margin-top:.5rem;
+}

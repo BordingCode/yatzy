@@ -1,0 +1,74 @@
+/* ── Dice Area ── */
+.dice-area{
+  display:flex;flex-direction:column;align-items:center;
+  padding:.7rem .5rem;flex-shrink:0;
+  border-bottom:2px solid var(--felt-border);
+}
+.dice-row{display:flex;gap:.6rem;margin-bottom:.6rem;justify-content:center}
+
+.die{
+  width:54px;height:54px;
+  background:linear-gradient(145deg, #FFFFFF, #F0EBE0);
+  border:2px solid var(--dice-border);
+  border-radius:10px;
+  display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);
+  padding:7px;cursor:pointer;
+  transition:transform .15s,border-color .15s,box-shadow .15s;
+  position:relative;
+  box-shadow:
+    2px 3px 6px var(--dice-shadow),
+    inset 0 1px 2px rgba(255,255,255,.9);
+}
+.die:active{transform:scale(.93)}
+.die.held{
+  border-color:var(--brass);
+  box-shadow:0 0 14px rgba(184,150,62,.45), 2px 3px 6px var(--dice-shadow);
+  background:linear-gradient(145deg, #FFF8E8, #F0E8D0);
+}
+.die.held::after{
+  content:'HOLD';position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);
+  font-size:.5rem;font-family:'Cinzel',serif;font-weight:700;color:var(--brass);white-space:nowrap;
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+.die.disabled{opacity:.4;pointer-events:none}
+
+.pip{
+  width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, #444, #1a1a1a);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.4);
+}
+.pip.hide{visibility:hidden}
+
+.roll-btn{
+  padding:.5rem 2.2rem;border:2px solid var(--brass);border-radius:8px;
+  background:linear-gradient(180deg, rgba(184,150,62,.2), rgba(184,150,62,.08));
+  color:var(--brass-light);font-family:'Cinzel',serif;
+  font-weight:700;font-size:.95rem;cursor:pointer;
+  transition:background .15s,transform .1s;
+  text-shadow:0 1px 2px rgba(0,0,0,.3);
+}
+.roll-btn:hover{background:linear-gradient(180deg, rgba(184,150,62,.3), rgba(184,150,62,.15))}
+.roll-btn:active{transform:scale(.96)}
+.roll-btn:disabled{opacity:.35;cursor:default;transform:none}
+
+/* Roll animation */
+@keyframes diceRoll{
+  0%{transform:translateY(0) rotateZ(0deg) scale(1)}
+  15%{transform:translateY(-8px) rotateZ(12deg) scale(.92)}
+  35%{transform:translateY(2px) rotateZ(-8deg) scale(1.04)}
+  55%{transform:translateY(-3px) rotateZ(4deg) scale(.97)}
+  75%{transform:translateY(1px) rotateZ(-2deg) scale(1.01)}
+  100%{transform:translateY(0) rotateZ(0deg) scale(1)}
+}
+.die.rolling{animation:diceRoll .35s ease-out}
+
+/* Stagger animation for each die */
+.die.roll-delay-1{animation-delay:0s}
+.die.roll-delay-2{animation-delay:.03s}
+.die.roll-delay-3{animation-delay:.06s}
+.die.roll-delay-4{animation-delay:.09s}
+.die.roll-delay-5{animation-delay:.12s}
+
+@media(max-width:400px){
+  .die{width:46px;height:46px;padding:5px;border-radius:8px}
+}
