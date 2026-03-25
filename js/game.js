@@ -114,19 +114,42 @@ const CALC = [
 ];
 
 // ═══════════════════════════════════════════
-// COLUMN 5 LOGIC (fixed)
+// COLUMN 5 LOGIC
+// Each die belongs to the last roll it was thrown in.
+// Dice from the same roll form a group.
+// The best-scoring group is used automatically.
 // ═══════════════════════════════════════════
-function getCol5Dice() {
-  // First roll only: all 5 dice count (same throw)
-  if (rollHistory.length <= 1) return [...dice];
-  // After re-rolls: only currently held dice count
-  return dice.filter((_, i) => held[i]);
+function getCol5Groups() {
+  if (rollHistory.length === 0) return [];
+  if (rollHistory.length === 1) return [[...dice]];
+
+  // Determine which roll each die was last thrown in
+  const lastRoll = new Array(5).fill(0);
+  for (let r = 0; r < rollHistory.length; r++) {
+    for (const idx of rollHistory[r]) {
+      lastRoll[idx] = r;
+    }
+  }
+
+  // Group dice values by their last roll
+  const groups = {};
+  for (let i = 0; i < 5; i++) {
+    const r = lastRoll[i];
+    if (!groups[r]) groups[r] = [];
+    groups[r].push(dice[i]);
+  }
+  return Object.values(groups);
 }
 
 function calcScoreForCol5(rowIdx) {
-  const col5dice = getCol5Dice();
-  if (col5dice.length === 0) return 0;
-  return CALC[rowIdx](col5dice);
+  const groups = getCol5Groups();
+  if (groups.length === 0) return 0;
+  let best = 0;
+  for (const group of groups) {
+    const score = CALC[rowIdx](group);
+    if (score > best) best = score;
+  }
+  return best;
 }
 
 // ═══════════════════════════════════════════
