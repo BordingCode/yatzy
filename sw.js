@@ -1,4 +1,4 @@
-const CACHE = 'yatzy-v1';
+const CACHE = 'yatzy-v2';
 const ASSETS = [
     './',
     'index.html',

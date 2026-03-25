@@ -1,114 +1,450 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Press+Start+2P&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box}
 
+/* ═══════════════════════════════════════════
+   DEFAULT THEME: Brætspil (Board Game)
+   ═══════════════════════════════════════════ */
 :root{
-  /* Wood tones */
-  --wood-dark:#4A2E14;
-  --wood-medium:#6B4423;
-  --wood-light:#8B5E3C;
-  --wood-highlight:#C4956A;
-  --wood-surface:#7A5231;
+  --font-heading:'Cinzel',serif;
+  --font-body:'Crimson Text',Georgia,serif;
 
-  /* Felt */
-  --felt:#2A6B2A;
-  --felt-dark:#1B4D1B;
-  --felt-light:#358535;
-  --felt-border:#3D7A35;
-
-  /* Dice */
-  --dice-white:#FEFCF6;
-  --dice-border:#D0C8B8;
-  --dice-shadow:rgba(0,0,0,.35);
-  --pip-color:#2C2C2C;
+  /* Accent */
+  --accent:#B8963E;
+  --accent-light:#D4B35A;
+  --accent-dim:#8A6D2B;
+  --accent-glow:rgba(184,150,62,.45);
+  --accent-bg:rgba(184,150,62,.12);
 
   /* Text */
-  --text-light:#F0E8DC;
-  --text-cream:#E8D8C4;
-  --text-warm:#D4C4A8;
-  --text-dim:#9A8A74;
+  --text-primary:#F0E8DC;
+  --text-secondary:#E8D8C4;
+  --text-muted:#9A8A74;
 
-  /* Accents */
-  --brass:#B8963E;
-  --brass-light:#D4B35A;
-  --brass-dim:#8A6D2B;
-  --leather:#6B3A2A;
-  --leather-light:#8B5A4A;
+  /* Surfaces */
+  --surface-bg:linear-gradient(180deg, rgba(74,46,20,.85), rgba(60,36,16,.9));
+  --surface-border:#C4956A;
+  --surface-shadow:0 4px 16px rgba(0,0,0,.4);
+  --input-bg:rgba(30,20,10,.6);
+  --input-border:#8B5E3C;
+
+  /* Top bar */
+  --topbar-bg:linear-gradient(180deg, #4A2E14, #3A2210);
+  --topbar-border:#C4956A;
+
+  /* Row labels */
+  --label-bg:linear-gradient(90deg, #6B3A2A, #8B5A4A);
+  --header-bg:linear-gradient(180deg, #4A2E14, #3A2210);
+  --header-bg-flat:#4A2E14;
+
+  /* Dice */
+  --die-bg:linear-gradient(145deg, #FFFFFF, #F0EBE0);
+  --die-border:#D0C8B8;
+  --die-shadow:rgba(0,0,0,.35);
+  --die-held-bg:linear-gradient(145deg, #FFF8E8, #F0E8D0);
+  --pip-bg:radial-gradient(circle at 40% 35%, #444, #1a1a1a);
+  --pip-shadow:rgba(0,0,0,.4);
+  --hold-color:var(--accent);
+
+  /* Roll button */
+  --roll-border:var(--accent);
+  --roll-bg:linear-gradient(180deg, rgba(184,150,62,.2), rgba(184,150,62,.08));
+  --roll-hover:linear-gradient(180deg, rgba(184,150,62,.3), rgba(184,150,62,.15));
+  --roll-color:#F0D060;
+  --roll-shadow:0 1px 3px rgba(0,0,0,.5);
+
+  /* Scorecard */
+  --cell-border:rgba(61,122,53,.4);
+  --cell-bg:rgba(30,80,26,.15);
+  --cell-filled-bg:rgba(20,60,18,.4);
+  --cell-filled-color:#FFFFFF;
+  --cell-valid-bg:rgba(184,150,62,.25);
+  --cell-valid-hover:rgba(184,150,62,.35);
+  --cell-valid-color:#F0D060;
+  --cell-zero:#B0A080;
+  --cell-flash:rgba(184,150,62,.5);
+  --cell-flash-end:rgba(30,80,26,.25);
+
+  /* Summary rows */
+  --sum-bg:rgba(74,46,20,.6);
+  --sum-color:#FFFFFF;
+  --sum-label-bg:linear-gradient(90deg, #4A2E14, #6B4423);
+  --bonus-color:#80E080;
+  --bonus-dim:#B0A080;
+  --total-color:var(--accent-light);
+
+  /* Buttons */
+  --btn-bg:linear-gradient(180deg, #C9A84C, #A88530);
+  --btn-color:#2A1A08;
+  --btn-shadow:0 1px 0 rgba(255,255,255,.2);
+  --btn-hover:linear-gradient(180deg, #D4B35A, #B89540);
+
+  /* Highscores */
+  --hs-border:rgba(139,94,60,.4);
+  --end-border:#8B5E3C;
+
+  /* Status */
   --red:#C44040;
-  --green-score:#5A9A5A;
+
+  /* Felt border */
+  --felt-border:#3D7A35;
 }
 
 html,body{height:100%;overflow:hidden}
 
 body{
-  color:var(--text-light);
-  font-family:'Crimson Text',Georgia,serif;
+  color:var(--text-primary);
+  font-family:var(--font-body);
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
   display:flex;
   flex-direction:column;
-  /* Wood grain background */
+}
+
+/* ── Body backgrounds per theme ── */
+body, [data-theme=""] body{
   background:
-    repeating-linear-gradient(
-      88deg,
-      transparent,
-      transparent 28px,
-      rgba(0,0,0,.04) 28px,
-      rgba(0,0,0,.04) 29px
-    ),
-    repeating-linear-gradient(
-      92deg,
-      transparent,
-      transparent 42px,
-      rgba(0,0,0,.03) 42px,
-      rgba(0,0,0,.03) 43px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 60px,
-      rgba(255,255,255,.02) 60px,
-      rgba(255,255,255,.02) 61px
-    ),
+    repeating-linear-gradient(88deg, transparent, transparent 28px, rgba(0,0,0,.04) 28px, rgba(0,0,0,.04) 29px),
+    repeating-linear-gradient(92deg, transparent, transparent 42px, rgba(0,0,0,.03) 42px, rgba(0,0,0,.03) 43px),
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,.02) 60px, rgba(255,255,255,.02) 61px),
     radial-gradient(ellipse at 20% 50%, rgba(196,149,106,.25) 0%, transparent 50%),
     radial-gradient(ellipse at 75% 25%, rgba(180,130,90,.2) 0%, transparent 40%),
     radial-gradient(ellipse at 50% 85%, rgba(160,110,70,.15) 0%, transparent 45%),
     linear-gradient(180deg, #7A5231, #6B4423, #5C3A1E, #6B4423);
 }
 
-/* Felt texture mixin-like pattern */
-.felt-bg{
+.felt-bg, [data-theme=""] .felt-bg{
   background:
     radial-gradient(circle at 15% 25%, rgba(255,255,255,.015) 1px, transparent 1px),
     radial-gradient(circle at 45% 65%, rgba(0,0,0,.025) 1px, transparent 1px),
     radial-gradient(circle at 75% 35%, rgba(255,255,255,.015) 1px, transparent 1px),
     radial-gradient(circle at 85% 85%, rgba(0,0,0,.025) 1px, transparent 1px),
-    radial-gradient(circle at 35% 15%, rgba(0,0,0,.02) 1px, transparent 1px),
-    radial-gradient(circle at 55% 45%, rgba(255,255,255,.01) 1px, transparent 1px),
     linear-gradient(170deg, #2D6A27, #256022, #1E501A);
   box-shadow:inset 0 2px 10px rgba(0,0,0,.35);
 }
 
-/* Brass/wood buttons */
+/* ═══════════════════════════════════════════
+   THEME: Elegant Mørk
+   ═══════════════════════════════════════════ */
+[data-theme="elegant"]{
+  --accent:#C9A84C;
+  --accent-light:#E0C060;
+  --accent-dim:#8A6D2B;
+  --accent-glow:rgba(201,168,76,.4);
+  --accent-bg:rgba(201,168,76,.1);
+  --text-primary:#E0D6C8;
+  --text-secondary:#C8BCA8;
+  --text-muted:#7A7068;
+  --surface-bg:linear-gradient(180deg, rgba(22,33,62,.92), rgba(16,24,48,.95));
+  --surface-border:#3A4A6A;
+  --surface-shadow:0 4px 16px rgba(0,0,0,.5);
+  --input-bg:rgba(10,14,30,.6);
+  --input-border:#3A4A6A;
+  --topbar-bg:linear-gradient(180deg, #0D0D1A, #10182E);
+  --topbar-border:#3A4A6A;
+  --label-bg:linear-gradient(90deg, #16213E, #1A2A50);
+  --header-bg:linear-gradient(180deg, #0D0D1A, #10182E);
+  --header-bg-flat:#0D0D1A;
+  --die-bg:linear-gradient(145deg, #F5F0E0, #E8E0D0);
+  --die-border:#B0A890;
+  --die-shadow:rgba(0,0,0,.4);
+  --die-held-bg:linear-gradient(145deg, #FFF8E0, #F0E8C8);
+  --pip-bg:radial-gradient(circle at 40% 35%, #333, #111);
+  --pip-shadow:rgba(0,0,0,.5);
+  --roll-border:var(--accent);
+  --roll-bg:linear-gradient(180deg, rgba(201,168,76,.15), rgba(201,168,76,.05));
+  --roll-hover:linear-gradient(180deg, rgba(201,168,76,.25), rgba(201,168,76,.1));
+  --roll-color:#E0C060;
+  --roll-shadow:0 1px 3px rgba(0,0,0,.6);
+  --cell-border:rgba(58,74,106,.5);
+  --cell-bg:rgba(22,33,62,.3);
+  --cell-filled-bg:rgba(22,33,62,.5);
+  --cell-filled-color:#FFFFFF;
+  --cell-valid-bg:rgba(201,168,76,.2);
+  --cell-valid-hover:rgba(201,168,76,.35);
+  --cell-valid-color:#E0C060;
+  --cell-zero:#7A7068;
+  --cell-flash:rgba(201,168,76,.5);
+  --cell-flash-end:rgba(22,33,62,.5);
+  --sum-bg:rgba(13,13,26,.6);
+  --sum-color:#FFFFFF;
+  --sum-label-bg:linear-gradient(90deg, #0D0D1A, #16213E);
+  --bonus-color:#70C880;
+  --bonus-dim:#7A7068;
+  --total-color:var(--accent-light);
+  --btn-bg:linear-gradient(180deg, #C9A84C, #A88530);
+  --btn-color:#1A1A2E;
+  --btn-shadow:0 1px 0 rgba(255,255,255,.15);
+  --btn-hover:linear-gradient(180deg, #D4B35A, #B89540);
+  --hs-border:rgba(58,74,106,.4);
+  --end-border:#3A4A6A;
+  --felt-border:#3A4A6A;
+}
+
+[data-theme="elegant"] body{
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(26,26,60,.8) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(22,33,62,.6) 0%, transparent 50%),
+    linear-gradient(180deg, #1A1A2E, #10182E, #0D0D1A);
+}
+
+[data-theme="elegant"] .felt-bg{
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.01) 1px, transparent 1px),
+    radial-gradient(circle at 60% 70%, rgba(0,0,0,.02) 1px, transparent 1px),
+    linear-gradient(170deg, #16213E, #121C38, #0E1630);
+  box-shadow:inset 0 2px 10px rgba(0,0,0,.4);
+}
+
+/* ═══════════════════════════════════════════
+   THEME: Casino
+   ═══════════════════════════════════════════ */
+[data-theme="casino"]{
+  --accent:#D4A84C;
+  --accent-light:#E8C060;
+  --accent-dim:#9A7A30;
+  --accent-glow:rgba(212,168,76,.45);
+  --accent-bg:rgba(212,168,76,.1);
+  --text-primary:#F0E8DC;
+  --text-secondary:#D8CDB8;
+  --text-muted:#8A7A68;
+  --surface-bg:linear-gradient(180deg, rgba(40,20,20,.9), rgba(30,14,14,.95));
+  --surface-border:#6A3030;
+  --surface-shadow:0 4px 20px rgba(0,0,0,.6);
+  --input-bg:rgba(20,8,8,.7);
+  --input-border:#6A3030;
+  --topbar-bg:linear-gradient(180deg, #1A0A0A, #120808);
+  --topbar-border:#8B3030;
+  --label-bg:linear-gradient(90deg, #4A1818, #5A2222);
+  --header-bg:linear-gradient(180deg, #1A0A0A, #120808);
+  --header-bg-flat:#1A0A0A;
+  --die-bg:linear-gradient(145deg, #FFFFFF, #F4F0E8);
+  --die-border:#C8C0B0;
+  --die-shadow:rgba(0,0,0,.5);
+  --die-held-bg:linear-gradient(145deg, #FFFAE8, #F0E8D0);
+  --pip-bg:radial-gradient(circle at 40% 35%, #333, #0a0a0a);
+  --pip-shadow:rgba(0,0,0,.5);
+  --roll-border:var(--accent);
+  --roll-bg:linear-gradient(180deg, rgba(212,168,76,.2), rgba(212,168,76,.08));
+  --roll-hover:linear-gradient(180deg, rgba(212,168,76,.3), rgba(212,168,76,.15));
+  --roll-color:#E8C060;
+  --roll-shadow:0 1px 3px rgba(0,0,0,.6);
+  --cell-border:rgba(139,48,48,.35);
+  --cell-bg:rgba(80,20,20,.2);
+  --cell-filled-bg:rgba(80,20,20,.35);
+  --cell-filled-color:#FFFFFF;
+  --cell-valid-bg:rgba(212,168,76,.2);
+  --cell-valid-hover:rgba(212,168,76,.35);
+  --cell-valid-color:#E8C060;
+  --cell-zero:#8A7A68;
+  --cell-flash:rgba(212,168,76,.5);
+  --cell-flash-end:rgba(80,20,20,.35);
+  --sum-bg:rgba(26,10,10,.6);
+  --sum-color:#FFFFFF;
+  --sum-label-bg:linear-gradient(90deg, #1A0A0A, #301414);
+  --bonus-color:#70D070;
+  --bonus-dim:#8A7A68;
+  --total-color:var(--accent-light);
+  --btn-bg:linear-gradient(180deg, #D4A84C, #B08830);
+  --btn-color:#1A0A0A;
+  --btn-shadow:0 1px 0 rgba(255,255,255,.15);
+  --btn-hover:linear-gradient(180deg, #E0B85A, #C09840);
+  --hs-border:rgba(139,48,48,.3);
+  --end-border:#6A3030;
+  --felt-border:#8B3030;
+}
+
+[data-theme="casino"] body{
+  background:
+    radial-gradient(ellipse at 40% 30%, rgba(60,20,20,.5) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 70%, rgba(40,10,10,.4) 0%, transparent 50%),
+    linear-gradient(180deg, #1A1A1A, #141010, #0E0808);
+}
+
+[data-theme="casino"] .felt-bg{
+  background:
+    radial-gradient(circle at 15% 25%, rgba(255,255,255,.01) 1px, transparent 1px),
+    radial-gradient(circle at 55% 60%, rgba(0,0,0,.03) 1px, transparent 1px),
+    radial-gradient(circle at 80% 40%, rgba(255,255,255,.01) 1px, transparent 1px),
+    linear-gradient(170deg, #6B1A1A, #551515, #401010);
+  box-shadow:inset 0 2px 10px rgba(0,0,0,.5);
+}
+
+/* ═══════════════════════════════════════════
+   THEME: Lys & Moderne (Light)
+   ═══════════════════════════════════════════ */
+[data-theme="light"]{
+  --font-heading:'Cinzel',serif;
+  --font-body:'Crimson Text',Georgia,serif;
+  --accent:#4A6FA5;
+  --accent-light:#5A82B8;
+  --accent-dim:#3A5580;
+  --accent-glow:rgba(74,111,165,.35);
+  --accent-bg:rgba(74,111,165,.08);
+  --text-primary:#2C2C2C;
+  --text-secondary:#4A4A4A;
+  --text-muted:#8A8A8A;
+  --surface-bg:linear-gradient(180deg, rgba(255,255,255,.95), rgba(245,243,238,.95));
+  --surface-border:#D0D0D0;
+  --surface-shadow:0 2px 12px rgba(0,0,0,.1);
+  --input-bg:rgba(255,255,255,.8);
+  --input-border:#C8C8C8;
+  --topbar-bg:linear-gradient(180deg, #FFFFFF, #F5F3EE);
+  --topbar-border:#D0D0D0;
+  --label-bg:linear-gradient(90deg, #E8E4DC, #F0ECE4);
+  --header-bg:linear-gradient(180deg, #FFFFFF, #F5F3EE);
+  --header-bg-flat:#FFFFFF;
+  --die-bg:linear-gradient(145deg, #FFFFFF, #F0EDE5);
+  --die-border:#C0C0C0;
+  --die-shadow:rgba(0,0,0,.15);
+  --die-held-bg:linear-gradient(145deg, #E8F0FF, #D8E4F8);
+  --pip-bg:radial-gradient(circle at 40% 35%, #4A6FA5, #2A4570);
+  --pip-shadow:rgba(0,0,0,.3);
+  --hold-color:var(--accent);
+  --roll-border:var(--accent);
+  --roll-bg:linear-gradient(180deg, rgba(74,111,165,.12), rgba(74,111,165,.04));
+  --roll-hover:linear-gradient(180deg, rgba(74,111,165,.2), rgba(74,111,165,.08));
+  --roll-color:#3A5580;
+  --roll-shadow:0 1px 2px rgba(0,0,0,.15);
+  --cell-border:rgba(0,0,0,.1);
+  --cell-bg:rgba(74,111,165,.04);
+  --cell-filled-bg:rgba(74,111,165,.08);
+  --cell-filled-color:#1A1A1A;
+  --cell-valid-bg:rgba(74,111,165,.12);
+  --cell-valid-hover:rgba(74,111,165,.2);
+  --cell-valid-color:#3A5580;
+  --cell-zero:#AAAAAA;
+  --cell-flash:rgba(74,111,165,.3);
+  --cell-flash-end:rgba(74,111,165,.08);
+  --sum-bg:rgba(74,111,165,.1);
+  --sum-color:#1A1A1A;
+  --sum-label-bg:linear-gradient(90deg, #D8D4CC, #E8E4DC);
+  --bonus-color:#2A8A40;
+  --bonus-dim:#AAAAAA;
+  --total-color:var(--accent);
+  --btn-bg:linear-gradient(180deg, #4A6FA5, #3A5A8A);
+  --btn-color:#FFFFFF;
+  --btn-shadow:none;
+  --btn-hover:linear-gradient(180deg, #5A82B8, #4A6FA5);
+  --hs-border:rgba(0,0,0,.08);
+  --end-border:#D0D0D0;
+  --felt-border:#D0D0D0;
+  --red:#C44040;
+}
+
+[data-theme="light"] body{
+  background:linear-gradient(180deg, #F8F6F2, #F0ECE4, #E8E4DC);
+}
+
+[data-theme="light"] .felt-bg{
+  background:linear-gradient(170deg, #F5F3EE, #EEEBE4, #E8E4DC);
+  box-shadow:inset 0 1px 4px rgba(0,0,0,.06);
+}
+
+/* ═══════════════════════════════════════════
+   THEME: Retro Arcade
+   ═══════════════════════════════════════════ */
+[data-theme="retro"]{
+  --font-heading:'Press Start 2P',monospace;
+  --font-body:'Press Start 2P',monospace;
+  --accent:#00FF66;
+  --accent-light:#40FF88;
+  --accent-dim:#008833;
+  --accent-glow:rgba(0,255,102,.35);
+  --accent-bg:rgba(0,255,102,.08);
+  --text-primary:#CCFFCC;
+  --text-secondary:#88DD88;
+  --text-muted:#447744;
+  --surface-bg:linear-gradient(180deg, rgba(0,20,0,.9), rgba(0,10,0,.95));
+  --surface-border:#00AA44;
+  --surface-shadow:0 0 20px rgba(0,255,102,.1);
+  --input-bg:rgba(0,10,0,.8);
+  --input-border:#00AA44;
+  --topbar-bg:linear-gradient(180deg, #000800, #001000);
+  --topbar-border:#00AA44;
+  --label-bg:linear-gradient(90deg, #001A00, #002800);
+  --header-bg:linear-gradient(180deg, #000800, #001000);
+  --header-bg-flat:#000800;
+  --die-bg:linear-gradient(145deg, #1A1A1A, #0A0A0A);
+  --die-border:#00AA44;
+  --die-shadow:rgba(0,255,102,.15);
+  --die-held-bg:linear-gradient(145deg, #0A2A0A, #001A00);
+  --pip-bg:radial-gradient(circle at 50% 50%, #00FF66, #00CC44);
+  --pip-shadow:rgba(0,255,102,.4);
+  --hold-color:#00FF66;
+  --roll-border:#00FF66;
+  --roll-bg:linear-gradient(180deg, rgba(0,255,102,.1), rgba(0,255,102,.03));
+  --roll-hover:linear-gradient(180deg, rgba(0,255,102,.2), rgba(0,255,102,.08));
+  --roll-color:#00FF66;
+  --roll-shadow:0 0 8px rgba(0,255,102,.3);
+  --cell-border:rgba(0,170,68,.3);
+  --cell-bg:rgba(0,40,0,.3);
+  --cell-filled-bg:rgba(0,60,0,.4);
+  --cell-filled-color:#00FF66;
+  --cell-valid-bg:rgba(0,255,102,.1);
+  --cell-valid-hover:rgba(0,255,102,.2);
+  --cell-valid-color:#00FF66;
+  --cell-zero:#447744;
+  --cell-flash:rgba(0,255,102,.4);
+  --cell-flash-end:rgba(0,60,0,.4);
+  --sum-bg:rgba(0,20,0,.6);
+  --sum-color:#00FF66;
+  --sum-label-bg:linear-gradient(90deg, #001000, #001A00);
+  --bonus-color:#FFFF00;
+  --bonus-dim:#447744;
+  --total-color:#00FF66;
+  --btn-bg:linear-gradient(180deg, #00CC44, #008833);
+  --btn-color:#000000;
+  --btn-shadow:0 0 10px rgba(0,255,102,.2);
+  --btn-hover:linear-gradient(180deg, #00FF66, #00AA44);
+  --hs-border:rgba(0,170,68,.25);
+  --end-border:#00AA44;
+  --felt-border:#00AA44;
+  --red:#FF4444;
+}
+
+[data-theme="retro"] body{
+  background:#000000;
+}
+
+[data-theme="retro"] .felt-bg{
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0,255,102,.02) 0%, transparent 70%),
+    #000000;
+  box-shadow:inset 0 0 30px rgba(0,255,102,.05);
+}
+
+/* Retro: smaller fonts since pixel font is wide */
+[data-theme="retro"] .start-title{font-size:1.4rem !important}
+[data-theme="retro"] .start-subtitle{font-size:.6rem}
+[data-theme="retro"] .start-box label{font-size:.6rem}
+[data-theme="retro"] .start-box select,
+[data-theme="retro"] .start-box input{font-size:.7rem}
+[data-theme="retro"] .btn{font-size:.7rem;padding:.6rem}
+[data-theme="retro"] .player-tab{font-size:.5rem}
+[data-theme="retro"] .turn-info{font-size:.5rem}
+[data-theme="retro"] .roll-btn{font-size:.65rem;padding:.4rem 1.4rem}
+[data-theme="retro"] .scorecard{font-size:.55rem}
+[data-theme="retro"] .scorecard .row-label{font-size:.5rem;min-width:100px;max-width:100px}
+[data-theme="retro"] .scorecard thead th{font-size:.5rem}
+[data-theme="retro"] .scorecard .total-row td{font-size:.6rem}
+[data-theme="retro"] .end-title{font-size:1.1rem}
+[data-theme="retro"] .highscore-title{font-size:.65rem}
+[data-theme="retro"] .highscore-list li{font-size:.6rem}
+[data-theme="retro"] .die.held::after{font-size:.35rem}
+[data-theme="retro"] .end-score-name{font-size:.7rem}
+[data-theme="retro"] .end-score-val{font-size:.75rem}
+
+/* ── Buttons (shared) ── */
 .btn{
   display:block;width:100%;padding:.7rem;border:none;border-radius:8px;
-  font-family:'Cinzel',serif;font-weight:700;font-size:1.1rem;cursor:pointer;
+  font-family:var(--font-heading);font-weight:700;font-size:1.1rem;cursor:pointer;
   transition:background .15s,transform .1s;
 }
 .btn:active{transform:scale(.97)}
-
 .btn-brass{
-  background:linear-gradient(180deg, #C9A84C, #A88530);
-  color:#2A1A08;
-  text-shadow:0 1px 0 rgba(255,255,255,.2);
-  box-shadow:0 2px 4px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.2);
+  background:var(--btn-bg);color:var(--btn-color);
+  text-shadow:var(--btn-shadow);
+  box-shadow:0 2px 4px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.15);
 }
-.btn-brass:hover{background:linear-gradient(180deg, #D4B35A, #B89540)}
-
-.btn-wood{
-  background:linear-gradient(180deg, var(--wood-light), var(--wood-medium));
-  color:var(--text-cream);
-  border:1px solid var(--wood-dark);
-  box-shadow:0 2px 4px rgba(0,0,0,.3);
-  margin-top:.5rem;
-}
+.btn-brass:hover{background:var(--btn-hover)}

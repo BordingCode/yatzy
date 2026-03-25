@@ -7,75 +7,75 @@
   border-collapse:collapse;width:100%;min-width:420px;font-size:.8rem;
 }
 .scorecard th,.scorecard td{
-  border:1px solid rgba(61,122,53,.4);padding:.25rem .3rem;text-align:center;
+  border:1px solid var(--cell-border);padding:.25rem .3rem;text-align:center;
   white-space:nowrap;
 }
 .scorecard thead th{
   position:sticky;top:0;z-index:2;
-  background:linear-gradient(180deg, var(--wood-dark), #3A2210);
-  font-family:'Cinzel',serif;font-weight:700;color:var(--brass);font-size:.7rem;
-  border-bottom:2px solid var(--brass-dim);
+  background:var(--header-bg);
+  font-family:var(--font-heading);font-weight:700;color:var(--accent);font-size:.7rem;
+  border-bottom:2px solid var(--accent-dim);
 }
 .scorecard .row-label{
   position:sticky;left:0;z-index:1;
-  background:linear-gradient(90deg, var(--leather), var(--leather-light));
-  text-align:left;font-weight:600;padding-left:.5rem;color:var(--text-cream);
+  background:var(--label-bg);
+  text-align:left;font-weight:600;padding-left:.5rem;color:var(--text-secondary);
   min-width:95px;max-width:95px;
-  border-right:2px solid var(--brass-dim);
+  border-right:2px solid var(--accent-dim);
 }
 .scorecard thead .corner{
   position:sticky;left:0;z-index:3;
-  background:linear-gradient(135deg, var(--wood-dark), #3A2210);
+  background:var(--header-bg-flat);
 }
 .scorecard .col-header{min-width:52px}
 
 .scorecard td.score-cell{
   cursor:default;height:28px;transition:background .15s;
-  background:rgba(30,80,26,.15);
+  background:var(--cell-bg);
 }
 .scorecard td.score-cell.filled{
-  color:#FFFFFF;font-weight:700;
-  background:rgba(20,60,18,.4);
+  color:var(--cell-filled-color);font-weight:700;
+  background:var(--cell-filled-bg);
 }
 .scorecard td.score-cell.valid{
-  background:rgba(184,150,62,.25);
-  cursor:pointer;color:#F0D060;
+  background:var(--cell-valid-bg);
+  cursor:pointer;color:var(--cell-valid-color);
   font-weight:400;font-style:italic;
 }
 .scorecard td.score-cell.valid:hover{
-  background:rgba(184,150,62,.35);
+  background:var(--cell-valid-hover);
 }
-.scorecard td.score-cell.zero-score{color:#B0A080}
+.scorecard td.score-cell.zero-score{color:var(--cell-zero)}
 
 /* Flash animation for newly placed score */
 @keyframes scorePlaced{
-  0%{background:rgba(184,150,62,.5)}
-  100%{background:rgba(30,80,26,.25)}
+  0%{background:var(--cell-flash)}
+  100%{background:var(--cell-flash-end)}
 }
 .scorecard td.score-cell.just-placed{
   animation:scorePlaced .6s ease-out;
 }
 
 .scorecard .sum-row td,.scorecard .sum-row th{
-  background:rgba(74,46,20,.6);font-weight:700;color:#FFFFFF;
-  border-top:2px solid var(--brass-dim);
-  border-bottom:2px solid var(--brass-dim);
+  background:var(--sum-bg);font-weight:700;color:var(--sum-color);
+  border-top:2px solid var(--accent-dim);
+  border-bottom:2px solid var(--accent-dim);
 }
 .scorecard .sum-row .row-label{
-  background:linear-gradient(90deg, var(--wood-dark), var(--wood-medium));
+  background:var(--sum-label-bg);
 }
-.scorecard .bonus-row td{color:#80E080;font-weight:700}
-.scorecard .bonus-row td.no-bonus{color:#B0A080;font-weight:400}
+.scorecard .bonus-row td{color:var(--bonus-color);font-weight:700}
+.scorecard .bonus-row td.no-bonus{color:var(--bonus-dim);font-weight:400}
 .scorecard .bonus-row .row-label{
-  background:linear-gradient(90deg, var(--leather), var(--leather-light));
+  background:var(--label-bg);
 }
 .scorecard .total-row td,.scorecard .total-row th{
-  background:rgba(74,46,20,.6);font-weight:700;color:var(--brass-light);
-  font-family:'Cinzel',serif;font-size:.85rem;
-  border-top:2px solid var(--brass);
+  background:var(--sum-bg);font-weight:700;color:var(--total-color);
+  font-family:var(--font-heading);font-size:.85rem;
+  border-top:2px solid var(--accent);
 }
 .scorecard .total-row .row-label{
-  background:linear-gradient(90deg, var(--wood-dark), var(--wood-medium));
+  background:var(--sum-label-bg);
 }
 
 @media(max-width:400px){

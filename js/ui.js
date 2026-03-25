@@ -112,7 +112,7 @@ function renderTabs() {
     tab.className = 'player-tab' + (i === viewingPlayer ? ' active' : '');
     const total = getGrandTotal(i);
     tab.innerHTML = `${p.name}<span class="tab-score">${total}</span>`;
-    if (i === currentPlayer) tab.style.borderColor = 'var(--brass-dim)';
+    if (i === currentPlayer) tab.style.borderColor = 'var(--accent-dim)';
     tab.addEventListener('click', () => {
       viewingPlayer = i;
       renderTabs();
@@ -223,6 +223,23 @@ function updatePlayerInputs() {
 }
 
 // ═══════════════════════════════════════════
+// THEME SYSTEM
+// ═══════════════════════════════════════════
+const THEME_KEY = 'yatzy_theme';
+
+function loadTheme() {
+  const theme = localStorage.getItem(THEME_KEY) || '';
+  applyTheme(theme);
+  const select = document.getElementById('themeSelect');
+  if (select) select.value = theme;
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+// ═══════════════════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════════════════
 document.getElementById('playerCount').addEventListener('change', updatePlayerInputs);
@@ -230,6 +247,9 @@ document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('rollBtn').addEventListener('click', rollDice);
 document.getElementById('undoBtn').addEventListener('click', undoLastMove);
 document.getElementById('soundBtn').addEventListener('click', toggleSound);
+document.getElementById('themeSelect').addEventListener('change', (e) => {
+  applyTheme(e.target.value);
+});
 document.getElementById('playAgainBtn').addEventListener('click', () => {
   showScreen('startScreen');
   updatePlayerInputs();
@@ -237,6 +257,7 @@ document.getElementById('playAgainBtn').addEventListener('click', () => {
 });
 
 // Init
+loadTheme();
 updatePlayerInputs();
 renderHighscoreBox('startHighscores');
 updateSoundBtn();

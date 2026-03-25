@@ -10,7 +10,12 @@ function saveUndoState() {
       scores: p.scores
     })))),
     currentPlayer: currentPlayer,
-    viewingPlayer: viewingPlayer
+    viewingPlayer: viewingPlayer,
+    dice: [...dice],
+    held: [...held],
+    rollsLeft: rollsLeft,
+    hasRolled: hasRolled,
+    rollHistory: JSON.parse(JSON.stringify(rollHistory))
   });
 }
 
@@ -28,12 +33,12 @@ function undoLastMove() {
   currentPlayer = state.currentPlayer;
   viewingPlayer = state.viewingPlayer;
 
-  // Reset dice for a fresh turn
-  dice = [1, 1, 1, 1, 1];
-  held = [false, false, false, false, false];
-  rollsLeft = 3;
-  hasRolled = false;
-  rollHistory = [];
+  // Restore exact dice state (no free rolls)
+  dice = state.dice;
+  held = state.held;
+  rollsLeft = state.rollsLeft;
+  hasRolled = state.hasRolled;
+  rollHistory = state.rollHistory;
   lastPlacedCell = null;
 
   renderAll();
