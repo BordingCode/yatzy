@@ -34,18 +34,18 @@
   background:rgba(30,80,26,.15);
 }
 .scorecard td.score-cell.filled{
-  color:var(--text-light);font-weight:700;
-  background:rgba(30,80,26,.25);
+  color:#FFFFFF;font-weight:700;
+  background:rgba(20,60,18,.4);
 }
 .scorecard td.score-cell.valid{
-  background:rgba(184,150,62,.2);
-  cursor:pointer;color:var(--brass-light);
+  background:rgba(184,150,62,.25);
+  cursor:pointer;color:#F0D060;
   font-weight:400;font-style:italic;
 }
 .scorecard td.score-cell.valid:hover{
   background:rgba(184,150,62,.35);
 }
-.scorecard td.score-cell.zero-score{color:var(--text-dim)}
+.scorecard td.score-cell.zero-score{color:#B0A080}
 
 /* Flash animation for newly placed score */
 @keyframes scorePlaced{
@@ -57,15 +57,15 @@
 }
 
 .scorecard .sum-row td,.scorecard .sum-row th{
-  background:rgba(74,46,20,.5);font-weight:700;
+  background:rgba(74,46,20,.6);font-weight:700;color:#FFFFFF;
   border-top:2px solid var(--brass-dim);
   border-bottom:2px solid var(--brass-dim);
 }
 .scorecard .sum-row .row-label{
   background:linear-gradient(90deg, var(--wood-dark), var(--wood-medium));
 }
-.scorecard .bonus-row td{color:var(--green-score);font-weight:700}
-.scorecard .bonus-row td.no-bonus{color:var(--text-dim);font-weight:400}
+.scorecard .bonus-row td{color:#80E080;font-weight:700}
+.scorecard .bonus-row td.no-bonus{color:#B0A080;font-weight:400}
 .scorecard .bonus-row .row-label{
   background:linear-gradient(90deg, var(--leather), var(--leather-light));
 }
