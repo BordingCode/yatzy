@@ -39,6 +39,7 @@ function toggleHold(i) {
 // ═══════════════════════════════════════════
 function rollDice() {
   if (rollsLeft <= 0) return;
+  clearUndoStack();
 
   const rolledIndices = [];
 
@@ -71,6 +72,7 @@ function rollDice() {
 
   renderRollBtn();
   renderScorecard();
+  renderUndoBtn();
 }
 
 function renderRollBtn() {

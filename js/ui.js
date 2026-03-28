@@ -66,6 +66,7 @@ function renderScorecard() {
 
   html += '</tbody>';
   table.innerHTML = html;
+  void table.offsetHeight; // Force reflow for mobile browsers
 
   // Add click handlers for valid cells
   if (canPlace) {
