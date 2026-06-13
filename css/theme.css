@@ -90,7 +90,7 @@
   --felt-border:#3D7A35;
 }
 
-html,body{height:100%;overflow:hidden}
+html,body{height:100svh;overflow:hidden}
 
 body{
   color:var(--text-primary);

@@ -193,7 +193,7 @@ function renderHighscoreBox(containerId, highlightIndices) {
       const isNew = highlightIndices && highlightIndices.includes(i);
       html += `<li class="${isNew ? 'hs-new' : ''}">
         <span class="hs-rank">${i + 1}.</span>
-        <span class="hs-name">${e.name}</span>
+        <span class="hs-name">${e.name}${e.mode ? `<span class="hs-mode">${e.mode}</span>` : ''}</span>
         <span class="hs-score">${e.score}</span>
         <span class="hs-date">${e.date || ''}</span>
       </li>`;
@@ -209,17 +209,34 @@ function renderHighscoreBox(containerId, highlightIndices) {
 // ═══════════════════════════════════════════
 // START SCREEN
 // ═══════════════════════════════════════════
+function makeNameInput(id, placeholder, value) {
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = placeholder;
+  input.value = value;
+  input.id = id;
+  return input;
+}
+
 function updatePlayerInputs() {
-  const n = parseInt(document.getElementById('playerCount').value);
+  const mode = (document.getElementById('gameMode') || {}).value || 'solo';
+  const cpuOpts = document.getElementById('cpuOptions');
+  const multiOpts = document.getElementById('multiOptions');
+  if (cpuOpts) cpuOpts.style.display = mode === 'cpu' ? '' : 'none';
+  if (multiOpts) multiOpts.style.display = mode === 'multi' ? '' : 'none';
+
   const container = document.getElementById('playerInputs');
   container.innerHTML = '';
-  for (let i = 0; i < n; i++) {
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = `Spiller ${i + 1} navn`;
-    input.value = `Spiller ${i + 1}`;
-    input.id = `pname${i}`;
-    container.appendChild(input);
+
+  if (mode === 'solo') {
+    container.appendChild(makeNameInput('pname0', 'Dit navn', 'Spiller 1'));
+  } else if (mode === 'cpu') {
+    container.appendChild(makeNameInput('pname0', 'Dit navn', 'Dig'));
+  } else {
+    const n = parseInt(document.getElementById('playerCount').value);
+    for (let i = 0; i < n; i++) {
+      container.appendChild(makeNameInput(`pname${i}`, `Spiller ${i + 1} navn`, `Spiller ${i + 1}`));
+    }
   }
 }
 
@@ -235,16 +252,39 @@ function loadTheme() {
   if (select) select.value = theme;
 }
 
+// Primary colour per theme for the browser/PWA toolbar tint
+const THEME_COLORS = {
+  '': '#5C3A1E',          // Brætspil (board game)
+  'elegant': '#16213E',   // Elegant Mørk
+  'casino': '#1A0A0A',    // Casino
+  'light': '#F5F3EE',     // Lys & Moderne
+  'retro': '#000800'      // Retro Arcade
+};
+
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem(THEME_KEY, theme);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS['']);
 }
 
 // ═══════════════════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════════════════
+document.getElementById('gameMode').addEventListener('change', updatePlayerInputs);
 document.getElementById('playerCount').addEventListener('change', updatePlayerInputs);
 document.getElementById('startBtn').addEventListener('click', startGame);
+
+// ── Rules panel ──
+function openRules() { document.getElementById('rulesOverlay').classList.add('active'); }
+function closeRules() { document.getElementById('rulesOverlay').classList.remove('active'); }
+document.getElementById('rulesBtn').addEventListener('click', openRules);
+document.getElementById('helpBtn').addEventListener('click', openRules);
+document.getElementById('rulesCloseBtn').addEventListener('click', closeRules);
+document.getElementById('rulesGotItBtn').addEventListener('click', closeRules);
+document.getElementById('rulesOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'rulesOverlay') closeRules();
+});
 document.getElementById('rollBtn').addEventListener('click', rollDice);
 document.getElementById('undoBtn').addEventListener('click', undoLastMove);
 document.getElementById('soundBtn').addEventListener('click', toggleSound);

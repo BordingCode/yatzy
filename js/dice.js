@@ -28,6 +28,7 @@ function renderDice() {
 }
 
 function toggleHold(i) {
+  if (typeof aiThinking !== 'undefined' && aiThinking) return;
   if (!hasRolled || rollsLeft === 0) return;
   held[i] = !held[i];
   renderDice();
@@ -58,25 +59,73 @@ function rollDice() {
   playRollSound();
   vibrate([30, 20, 30]);
 
-  // Animate rolled dice with stagger
+  // Animate rolled dice: tumble through random faces, then settle on the real value.
   renderDice();
-  const dieEls = document.querySelectorAll('.die');
-  rolledIndices.forEach((idx, i) => {
-    if (dieEls[idx]) {
-      dieEls[idx].classList.add('rolling', `roll-delay-${i + 1}`);
-      setTimeout(() => {
-        dieEls[idx].classList.remove('rolling', `roll-delay-${i + 1}`);
-      }, 400);
-    }
-  });
+  animateRoll(rolledIndices);
 
   renderRollBtn();
   renderScorecard();
   renderUndoBtn();
 }
 
+// Tumble each rolling die through random faces before settling on the real value.
+// Staggered start (~60ms) gives a visible cascade; uses animationend so later
+// dice in the cascade aren't cut short by a single flat timeout.
+const TUMBLE_FACE_MS = 50;   // how often the shown face changes while tumbling
+const TUMBLE_DURATION = 300; // how long each die tumbles
+const TUMBLE_STAGGER = 60;   // delay between consecutive dice starting
+
+function animateRoll(rolledIndices) {
+  const dieEls = document.querySelectorAll('.die');
+
+  rolledIndices.forEach((idx, i) => {
+    const el = dieEls[idx];
+    if (!el) return;
+    const startDelay = i * TUMBLE_STAGGER;
+
+    setTimeout(() => {
+      // Re-fetch in case the DOM changed; bail if this die no longer exists
+      const live = document.querySelectorAll('.die')[idx];
+      if (!live) return;
+
+      live.classList.add('rolling');
+
+      // Clear the rolling class when the CSS animation actually ends
+      const onEnd = () => {
+        live.classList.remove('rolling');
+        live.removeEventListener('animationend', onEnd);
+      };
+      live.addEventListener('animationend', onEnd);
+
+      // Cycle through random faces during the tumble
+      const ticks = Math.floor(TUMBLE_DURATION / TUMBLE_FACE_MS);
+      let n = 0;
+      const faceTimer = setInterval(() => {
+        n++;
+        const cur = document.querySelectorAll('.die')[idx];
+        if (!cur || n >= ticks) {
+          clearInterval(faceTimer);
+          // Settle on the real value
+          if (cur) cur.innerHTML = renderDie(dice[idx]);
+          return;
+        }
+        cur.innerHTML = renderDie(Math.floor(Math.random() * 6) + 1);
+      }, TUMBLE_FACE_MS);
+
+      // Safety net: ensure rolling class is gone even if animationend is missed
+      setTimeout(onEnd, TUMBLE_DURATION + 120);
+    }, startDelay);
+  });
+}
+
 function renderRollBtn() {
   const btn = document.getElementById('rollBtn');
+  // During the computer's turn, the human can't roll
+  if (typeof isCpuTurn === 'function' && isCpuTurn()) {
+    btn.textContent = 'Computeren tænker…';
+    btn.disabled = true;
+    return;
+  }
   if (!hasRolled) {
     btn.textContent = 'Rul';
     btn.disabled = false;

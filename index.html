@@ -22,13 +22,27 @@
   <div class="start-title">Yatzy</div>
   <div class="start-subtitle">a la Bording</div>
   <div class="start-box">
-    <label>Antal spillere</label>
-    <select id="playerCount">
-      <option value="1">1 spiller</option>
-      <option value="2" selected>2 spillere</option>
-      <option value="3">3 spillere</option>
-      <option value="4">4 spillere</option>
+    <label>Spiltype</label>
+    <select id="gameMode">
+      <option value="solo" selected>Alene (øvebane)</option>
+      <option value="cpu">Mod computeren</option>
+      <option value="multi">Flere spillere</option>
     </select>
+    <div id="cpuOptions" style="display:none">
+      <label>Computerens niveau</label>
+      <select id="cpuLevel">
+        <option value="normal" selected>Normal</option>
+        <option value="easy">Let</option>
+      </select>
+    </div>
+    <div id="multiOptions" style="display:none">
+      <label>Antal spillere</label>
+      <select id="playerCount">
+        <option value="2" selected>2 spillere</option>
+        <option value="3">3 spillere</option>
+        <option value="4">4 spillere</option>
+      </select>
+    </div>
     <div class="player-inputs" id="playerInputs"></div>
     <label>Tema</label>
     <select id="themeSelect">
@@ -39,8 +53,37 @@
       <option value="retro">Retro Arcade</option>
     </select>
     <button class="btn btn-brass" id="startBtn">Start spil</button>
+    <button class="btn btn-rules" id="rulesBtn">Sådan spilles</button>
   </div>
   <div class="highscore-box" id="startHighscores"></div>
+</div>
+
+<!-- RULES PANEL -->
+<div class="rules-overlay" id="rulesOverlay">
+  <div class="rules-panel">
+    <button class="rules-close" id="rulesCloseBtn" title="Luk">&times;</button>
+    <h2 class="rules-title">Sådan spilles</h2>
+    <div class="rules-body">
+      <h3>Terningerne</h3>
+      <p>Du har <b>3 kast</b> pr. tur. Efter hvert kast kan du trykke på de terninger du vil <b>holde</b> (beholde) — de kastes ikke igen. Når du er færdig, skriver du resultatet ind i et felt på pointtavlen.</p>
+
+      <h3>De fem kolonner (&times;1 til &times;5)</h3>
+      <p>Pointtavlen har fem kolonner med en faktor: <b>&times;1, &times;2, &times;3, &times;4 og &times;5</b>. Alt hvad du skriver i en kolonne ganges med kolonnens faktor i totalen. Du udfylder alle felter i alle fem kolonner i løbet af spillet.</p>
+
+      <h3>Kolonne 3 og 4 har fast rækkefølge</h3>
+      <p>I <b>kolonne &times;3</b> skal felterne fyldes <b>oppefra og ned</b> (start med Ettere). I <b>kolonne &times;4</b> fyldes de <b>nedefra og op</b> (start med Yatzy). Du kan altså ikke vælge frit i de to kolonner.</p>
+
+      <h3>Kolonne 5 — bedste gruppe</h3>
+      <p>I <b>kolonne &times;5</b> tæller kun de terninger fra dit <b>sidste kast</b>. Spillet finder selv den bedste gruppe og bruger den højeste mulige score for feltet.</p>
+
+      <h3>Bonus i toppen</h3>
+      <p>Hvis summen af de seks øverste felter (Ettere til Seksere) i en kolonne når <b>63 eller mere</b>, får du <b>+50 i bonus</b> i den kolonne — før kolonnen ganges med sin faktor.</p>
+
+      <h3>Mod computeren</h3>
+      <p>Vælg <b>Mod computeren</b> for at spille mod en simpel modstander, der selv kaster, holder og skriver ind. Den spiller fornuftigt — slå den hvis du kan!</p>
+    </div>
+    <button class="btn btn-brass" id="rulesGotItBtn">Forstået</button>
+  </div>
 </div>
 
 <!-- GAME SCREEN -->
@@ -49,6 +92,7 @@
     <div class="player-tabs" id="playerTabs"></div>
     <div class="top-bar-right">
       <span class="turn-info" id="turnInfo"></span>
+      <button class="icon-btn" id="helpBtn" title="Regler">?</button>
       <button class="icon-btn" id="undoBtn" title="Fortryd" disabled>&#x21A9;</button>
       <button class="icon-btn" id="soundBtn" title="Lyd">&#x1F50A;</button>
     </div>
@@ -76,6 +120,7 @@
 <script src="js/game.js"></script>
 <script src="js/undo.js"></script>
 <script src="js/dice.js"></script>
+<script src="js/ai.js"></script>
 <script src="js/ui.js"></script>
 </body>
 </html>

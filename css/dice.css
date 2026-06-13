@@ -4,7 +4,7 @@
   padding:.7rem .5rem;flex-shrink:0;
   border-bottom:2px solid var(--felt-border);
 }
-.dice-row{display:flex;gap:.6rem;margin-bottom:.6rem;justify-content:center}
+.dice-row{display:flex;gap:.6rem;margin-bottom:.6rem;justify-content:center;perspective:600px}
 
 .die{
   width:54px;height:54px;
@@ -52,23 +52,16 @@
 .roll-btn:active{transform:scale(.96)}
 .roll-btn:disabled{opacity:.35;cursor:default;transform:none}
 
-/* Roll animation */
+/* Roll animation — a real multi-axis tumble while faces cycle (JS-driven) */
 @keyframes diceRoll{
-  0%{transform:translateY(0) rotateZ(0deg) scale(1)}
-  15%{transform:translateY(-8px) rotateZ(12deg) scale(.92)}
-  35%{transform:translateY(2px) rotateZ(-8deg) scale(1.04)}
-  55%{transform:translateY(-3px) rotateZ(4deg) scale(.97)}
-  75%{transform:translateY(1px) rotateZ(-2deg) scale(1.01)}
-  100%{transform:translateY(0) rotateZ(0deg) scale(1)}
+  0%{transform:translateY(0) rotateX(0) rotateY(0) rotateZ(0) scale(1)}
+  20%{transform:translateY(-12px) rotateX(140deg) rotateY(80deg) rotateZ(20deg) scale(.9)}
+  45%{transform:translateY(4px) rotateX(280deg) rotateY(180deg) rotateZ(-14deg) scale(1.05)}
+  70%{transform:translateY(-5px) rotateX(380deg) rotateY(300deg) rotateZ(8deg) scale(.97)}
+  88%{transform:translateY(2px) rotateX(440deg) rotateY(350deg) rotateZ(-3deg) scale(1.02)}
+  100%{transform:translateY(0) rotateX(0) rotateY(0) rotateZ(0) scale(1)}
 }
-.die.rolling{animation:diceRoll .35s ease-out}
-
-/* Stagger animation for each die */
-.die.roll-delay-1{animation-delay:0s}
-.die.roll-delay-2{animation-delay:.03s}
-.die.roll-delay-3{animation-delay:.06s}
-.die.roll-delay-4{animation-delay:.09s}
-.die.roll-delay-5{animation-delay:.12s}
+.die.rolling{animation:diceRoll .3s ease-out;z-index:2}
 
 @media(max-width:400px){
   .die{width:46px;height:46px;padding:5px;border-radius:8px}

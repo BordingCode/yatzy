@@ -1,4 +1,4 @@
-const CACHE = 'yatzy-v3';
+const CACHE = 'yatzy-v4';
 const ASSETS = [
     './',
     'index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
     'js/game.js',
     'js/undo.js',
     'js/dice.js',
+    'js/ai.js',
     'js/ui.js',
     'manifest.json',
     'icons/favicon.svg',
@@ -39,8 +40,11 @@ self.addEventListener('fetch', e => {
     e.respondWith(
         fetch(e.request)
             .then(resp => {
-                const clone = resp.clone();
-                caches.open(CACHE).then(cache => cache.put(e.request, clone));
+                // Only cache successful responses so a bad deploy can't poison the cache
+                if (resp && resp.ok && resp.type !== 'opaque') {
+                    const clone = resp.clone();
+                    caches.open(CACHE).then(cache => cache.put(e.request, clone));
+                }
                 return resp;
             })
             .catch(() => caches.match(e.request))

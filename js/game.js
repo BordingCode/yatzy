@@ -25,6 +25,9 @@ let hasRolled = false;
 let rollHistory = [];
 let viewingPlayer = 0;
 let lastPlacedCell = null; // {row, col} for flash animation
+let gameMode = 'solo';      // 'solo' | 'cpu' | 'multi'
+let cpuPlayerIndex = -1;    // player slot controlled by the computer (-1 = none)
+let cpuLevel = 'normal';    // 'normal' | 'easy'
 
 // ═══════════════════════════════════════════
 // SCORING FUNCTIONS
@@ -242,6 +245,8 @@ function isGameOver() {
 // ═══════════════════════════════════════════
 function placeScore(row, col) {
   const p = currentPlayer;
+  // Block human input during the computer's turn (the AI sets _aiPlacing to bypass)
+  if (typeof isCpuTurn === 'function' && isCpuTurn() && !window._aiPlacing) return;
   if (players[p].scores[row][col] !== null) return;
   if (!isValidCell(p, row, col)) return;
 
@@ -280,22 +285,47 @@ function nextTurn() {
   rollHistory = [];
 
   renderAll();
+
+  // If it's now the computer's turn, let it play
+  if (typeof runCpuTurn === 'function' && typeof isCpuTurn === 'function' && isCpuTurn()) {
+    runCpuTurn();
+  }
 }
 
 // ═══════════════════════════════════════════
 // START GAME
 // ═══════════════════════════════════════════
 function startGame() {
-  const n = parseInt(document.getElementById('playerCount').value);
+  const modeEl = document.getElementById('gameMode');
+  gameMode = modeEl ? modeEl.value : 'solo';
+  cpuLevel = (document.getElementById('cpuLevel') || {}).value || 'normal';
+  cpuPlayerIndex = -1;
+
+  // Determine player list per mode
+  let names = [];
+  if (gameMode === 'solo') {
+    const n0 = document.getElementById('pname0');
+    names = [ (n0 && n0.value.trim()) || 'Spiller 1' ];
+  } else if (gameMode === 'cpu') {
+    const n0 = document.getElementById('pname0');
+    names = [ (n0 && n0.value.trim()) || 'Dig', 'Computeren' ];
+    cpuPlayerIndex = 1;
+  } else { // multi
+    const n = parseInt(document.getElementById('playerCount').value);
+    for (let i = 0; i < n; i++) {
+      const el = document.getElementById(`pname${i}`);
+      names.push((el && el.value.trim()) || `Spiller ${i + 1}`);
+    }
+  }
+
   players = [];
-  for (let i = 0; i < n; i++) {
-    const name = document.getElementById(`pname${i}`).value.trim() || `Spiller ${i + 1}`;
+  names.forEach(name => {
     const scores = [];
     for (let r = 0; r < TOTAL_ROWS; r++) {
       scores.push(new Array(TOTAL_COLS).fill(null));
     }
     players.push({ name, scores });
-  }
+  });
 
   currentPlayer = 0;
   viewingPlayer = 0;
@@ -322,9 +352,16 @@ function getHighscores() {
   catch { return []; }
 }
 
-function saveHighscore(name, score) {
+// Human-readable label for the mode a score was achieved in
+function getModeTag() {
+  if (gameMode === 'solo') return 'Alene';
+  if (gameMode === 'cpu') return 'Mod CPU';
+  return `${players.length} spillere`;
+}
+
+function saveHighscore(name, score, mode) {
   const list = getHighscores();
-  const entry = { name, score, date: new Date().toLocaleDateString('da-DK') };
+  const entry = { name, score, mode, date: new Date().toLocaleDateString('da-DK') };
   list.push(entry);
   list.sort((a, b) => b.score - a.score);
   if (list.length > HS_MAX) list.length = HS_MAX;
@@ -334,9 +371,12 @@ function saveHighscore(name, score) {
 
 function saveGameHighscores() {
   const newIndices = [];
+  const tag = getModeTag();
   players.forEach((p, i) => {
+    // Don't record the computer itself on the leaderboard
+    if (gameMode === 'cpu' && i === cpuPlayerIndex) return;
     const total = getGrandTotal(i);
-    const idx = saveHighscore(p.name, total);
+    const idx = saveHighscore(p.name, total, tag);
     newIndices.push(idx);
   });
   return newIndices;
